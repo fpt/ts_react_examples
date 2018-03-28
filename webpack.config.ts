@@ -1,59 +1,38 @@
-import * as webpack from 'webpack';
-import {
-  createConfig, customConfig, match,
-  // Feature blocks
-  addPlugins, defineConstants, entryPoint, env,
-  group, setOutput, sourceMaps,
-  // Shorthand setters
-  devServer, file, typescript, uglify,
-} from 'webpack-blocks';
-import { html } from 'webpack-blocks-utils';
+import * as webpack from "webpack";
+import * as HtmlWebpackPlugin from 'html-webpack-plugin';
+import * as path from "path";
 
+interface Config extends webpack.Configuration {
+  module: {
+    rules: NewUseRule[]
+  };
+}
 
-const developmentConfig = () => group([
-  html({ template: `${__dirname}/index.html` }),
-  sourceMaps(),
-  devServer(),
-  addPlugins([
-    new webpack.LoaderOptionsPlugin({
-      debug: true,
-    }),
-  ]),
-]);
+interface NewUseRule extends webpack.NewUseRule {
+  use: webpack.NewLoader | webpack.NewLoader[];
+}
 
-const productionConfig = () => group([
-  uglify({
-    parallel: true,
-  }),
-  addPlugins([
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false,
-    }),
-  ]),
-]);
+const rules: NewUseRule[] = [
+  {
+    test: /\.tsx?$/,
+    exclude: /node_modules/,
+    use: {
+      loader: "ts-loader"
+    }
+  }
+];
 
-const config = createConfig([
-  setOutput({
-    filename: 'app.js',
-    path: `${__dirname}/dist`,
-    library: 'rplayground',
-    libraryTarget: 'umd',
-    umdNamedDefine: true,
-    publicPath: '/',
-  }),
-  customConfig({
-    resolve: {
-      modules: [`${__dirname}/src`, 'node_modules'],
-    },
-  }),
-  typescript(),
-  env('development', [
-    developmentConfig(),
-  ]),
-  env('production', [
-    productionConfig(),
-  ]),
-]);
+const config: Config = {
+  entry: path.join(__dirname, "./src/app.tsx"),
+  output: {
+    path: path.join(__dirname, "./dist"),
+    filename: "bundle.js"
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx']
+  },
+  plugins: [],
+  module: { rules }
+};
 
 export default config;

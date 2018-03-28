@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { render } from 'react-dom';
+import { Albums } from './itunes_music';
 
 
 const appElementId = '#root';
 
 
-const redirectComponent: React.StatelessComponent<React.Props<{}>> = () => (
-  <Redirect to={`${appBaseUri()}/profile/account`} />
-);
-
 const App: React.StatelessComponent<React.Props<{}>> = () => (
-  <div>Hello.</div>
+  <div>
+    <Albums query="jazz" />
+    <Albums query="blues" />
+  </div>
 );
 
 render((<App/>), document.querySelector(appElementId));
